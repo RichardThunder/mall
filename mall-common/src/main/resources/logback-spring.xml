@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration>
 <configuration>
+    <!--配置不打印logback内部的状态信息，排查logback配置问题时可注释掉-->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
     <!--引用默认日志配置-->
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <!--使用默认的控制台日志输出实现-->
@@ -11,10 +13,9 @@
     <property name="LOG_FILE_PATH" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/logs}"/>
     <!--LogStash访问host-->
     <springProperty name="LOG_STASH_HOST" scope="context" source="logstash.host" defaultValue="localhost"/>
-    <!--是否开启LogStash插件内部日志-->
-    <springProperty name="ENABLE_INNER_LOG" scope="context" source="logstash.enableInnerLog" defaultValue="false"/>
-    <!--配置不打印logback内部的状态信息，排查logback配置问题时可注释掉-->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <!--是否开启LogStash日志输出，true启用，false禁用-->
+    <springProperty name="ENABLE_LOG_STASH" scope="context" source="logstash.enableInnerLog" defaultValue="false"/>
+
     <!--DEBUG日志输出到文件-->
     <appender name="FILE_DEBUG"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
@@ -61,122 +62,143 @@
         </rollingPolicy>
     </appender>
 
-    <!--DEBUG日志输出到LogStash-->
-    <appender name="LOG_STASH_DEBUG" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>DEBUG</level>
-        </filter>
-        <destination>${LOG_STASH_HOST}:4560</destination>
-        <addDefaultStatusListener>${ENABLE_INNER_LOG}</addDefaultStatusListener>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>Asia/Shanghai</timeZone>
-                </timestamp>
-                <!--自定义日志输出格式-->
-                <pattern>
-                    <pattern>
-                        {
-                        "project": "mall",
-                        "level": "%level",
-                        "service": "${APP_NAME:-}",
-                        "pid": "${PID:-}",
-                        "thread": "%thread",
-                        "class": "%logger",
-                        "message": "%message",
-                        "stack_trace": "%exception{20}"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
-        </encoder>
-    </appender>
+    <!--当logstash.enableInnerLog为true时启用LogStash日志输出-->
+    <condition class="ch.qos.logback.core.boolex.PropertyEqualityCondition">
+        <key>ENABLE_LOG_STASH</key>
+        <value>true</value>
+    </condition>
 
-    <!--ERROR日志输出到LogStash-->
-    <appender name="LOG_STASH_ERROR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <destination>${LOG_STASH_HOST}:4561</destination>
-        <addDefaultStatusListener>${ENABLE_INNER_LOG}</addDefaultStatusListener>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>Asia/Shanghai</timeZone>
-                </timestamp>
-                <!--自定义日志输出格式-->
-                <pattern>
-                    <pattern>
-                        {
-                        "project": "mall",
-                        "level": "%level",
-                        "service": "${APP_NAME:-}",
-                        "pid": "${PID:-}",
-                        "thread": "%thread",
-                        "class": "%logger",
-                        "message": "%message",
-                        "stack_trace": "%exception{20}"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
-        </encoder>
-    </appender>
+    <if>
+        <then>
+            <!--DEBUG日志输出到LogStash-->
+            <appender name="LOG_STASH_DEBUG" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>DEBUG</level>
+                </filter>
+                <destination>${LOG_STASH_HOST}:4560</destination>
+                <addDefaultStatusListener>false</addDefaultStatusListener>
+                <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp>
+                            <timeZone>Asia/Shanghai</timeZone>
+                        </timestamp>
+                        <!--自定义日志输出格式-->
+                        <pattern>
+                            <pattern>
+                                {
+                                "project": "mall",
+                                "level": "%level",
+                                "service": "${APP_NAME:-}",
+                                "pid": "${PID:-}",
+                                "thread": "%thread",
+                                "class": "%logger",
+                                "message": "%message",
+                                "stack_trace": "%exception{20}"
+                                }
+                            </pattern>
+                        </pattern>
+                    </providers>
+                </encoder>
+            </appender>
 
-    <!--业务日志输出到LogStash-->
-    <appender name="LOG_STASH_BUSINESS" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${LOG_STASH_HOST}:4562</destination>
-        <addDefaultStatusListener>${ENABLE_INNER_LOG}</addDefaultStatusListener>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>Asia/Shanghai</timeZone>
-                </timestamp>
-                <!--自定义日志输出格式-->
-                <pattern>
-                    <pattern>
-                        {
-                        "project": "mall",
-                        "level": "%level",
-                        "service": "${APP_NAME:-}",
-                        "pid": "${PID:-}",
-                        "thread": "%thread",
-                        "class": "%logger",
-                        "message": "%message",
-                        "stack_trace": "%exception{20}"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
-        </encoder>
-    </appender>
+            <!--ERROR日志输出到LogStash-->
+            <appender name="LOG_STASH_ERROR" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+                <filter class="ch.qos.logback.classic.filter.LevelFilter">
+                    <level>ERROR</level>
+                    <onMatch>ACCEPT</onMatch>
+                    <onMismatch>DENY</onMismatch>
+                </filter>
+                <destination>${LOG_STASH_HOST}:4561</destination>
+                <addDefaultStatusListener>false</addDefaultStatusListener>
+                <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp>
+                            <timeZone>Asia/Shanghai</timeZone>
+                        </timestamp>
+                        <!--自定义日志输出格式-->
+                        <pattern>
+                            <pattern>
+                                {
+                                "project": "mall",
+                                "level": "%level",
+                                "service": "${APP_NAME:-}",
+                                "pid": "${PID:-}",
+                                "thread": "%thread",
+                                "class": "%logger",
+                                "message": "%message",
+                                "stack_trace": "%exception{20}"
+                                }
+                            </pattern>
+                        </pattern>
+                    </providers>
+                </encoder>
+            </appender>
 
-    <!--接口访问记录日志输出到LogStash-->
-    <appender name="LOG_STASH_RECORD" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-        <destination>${LOG_STASH_HOST}:4563</destination>
-        <addDefaultStatusListener>${ENABLE_INNER_LOG}</addDefaultStatusListener>
-        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <providers>
-                <timestamp>
-                    <timeZone>Asia/Shanghai</timeZone>
-                </timestamp>
-                <!--自定义日志输出格式-->
-                <pattern>
-                    <pattern>
-                        {
-                        "project": "mall",
-                        "level": "%level",
-                        "service": "${APP_NAME:-}",
-                        "class": "%logger",
-                        "message": "%message"
-                        }
-                    </pattern>
-                </pattern>
-            </providers>
-        </encoder>
-    </appender>
+            <!--业务日志输出到LogStash-->
+            <appender name="LOG_STASH_BUSINESS" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+                <destination>${LOG_STASH_HOST}:4562</destination>
+                <addDefaultStatusListener>false</addDefaultStatusListener>
+                <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp>
+                            <timeZone>Asia/Shanghai</timeZone>
+                        </timestamp>
+                        <!--自定义日志输出格式-->
+                        <pattern>
+                            <pattern>
+                                {
+                                "project": "mall",
+                                "level": "%level",
+                                "service": "${APP_NAME:-}",
+                                "pid": "${PID:-}",
+                                "thread": "%thread",
+                                "class": "%logger",
+                                "message": "%message",
+                                "stack_trace": "%exception{20}"
+                                }
+                            </pattern>
+                        </pattern>
+                    </providers>
+                </encoder>
+            </appender>
+
+            <!--接口访问记录日志输出到LogStash-->
+            <appender name="LOG_STASH_RECORD" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+                <destination>${LOG_STASH_HOST}:4563</destination>
+                <addDefaultStatusListener>false</addDefaultStatusListener>
+                <encoder charset="UTF-8" class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp>
+                            <timeZone>Asia/Shanghai</timeZone>
+                        </timestamp>
+                        <!--自定义日志输出格式-->
+                        <pattern>
+                            <pattern>
+                                {
+                                "project": "mall",
+                                "level": "%level",
+                                "service": "${APP_NAME:-}",
+                                "class": "%logger",
+                                "message": "%message"
+                                }
+                            </pattern>
+                        </pattern>
+                    </providers>
+                </encoder>
+            </appender>
+
+            <root level="DEBUG">
+                <appender-ref ref="LOG_STASH_DEBUG"/>
+                <appender-ref ref="LOG_STASH_ERROR"/>
+            </root>
+            <logger name="com.macro.mall.common.log.WebLogAspect" level="DEBUG">
+                <appender-ref ref="LOG_STASH_RECORD"/>
+            </logger>
+            <logger name="com.macro.mall" level="DEBUG">
+                <appender-ref ref="LOG_STASH_BUSINESS"/>
+            </logger>
+        </then>
+    </if>
 
     <!--控制框架输出日志-->
     <logger name="org.slf4j" level="INFO"/>
@@ -189,15 +211,5 @@
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE_DEBUG"/>
         <appender-ref ref="FILE_ERROR"/>
-        <appender-ref ref="LOG_STASH_DEBUG"/>
-        <appender-ref ref="LOG_STASH_ERROR"/>
     </root>
-
-    <logger name="com.macro.mall.common.log.WebLogAspect" level="DEBUG">
-        <appender-ref ref="LOG_STASH_RECORD"/>
-    </logger>
-
-    <logger name="com.macro.mall" level="DEBUG">
-        <appender-ref ref="LOG_STASH_BUSINESS"/>
-    </logger>
 </configuration>
