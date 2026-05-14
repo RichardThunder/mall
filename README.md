@@ -14,9 +14,9 @@
 
 > 1. **快速体验项目**：[在线访问地址](https://www.macrozheng.com/admin/index.html) 。
 > 2. **全套学习教程**：[《mall学习教程》](https://www.macrozheng.com) 。
-> 3. **视频教程（2023最新版）**：[《mall视频教程》](https://www.macrozheng.com/mall/catalog/mall_video.html) 。
+> 3. **视频教程**：[《mall视频教程》](https://www.macrozheng.com/mall/catalog/mall_video.html) 。
 > 4. **微服务版本**：基于Spring Cloud Alibaba的项目：[mall-swarm](https://github.com/macrozheng/mall-swarm) 。
-> 5. **分支说明**：`master`分支基于Spring Boot 2.7+JDK 8，`dev-v3`分支基于Spring Boot 3.2+JDK 17。
+> 5. **分支说明**：`master`分支基于Spring Boot 3.5+JDK 17，`dev-v2`分支基于Spring Boot 2.7+JDK 8。
 
 ## 前言
 
@@ -211,4 +211,4 @@ mall
 
 [Apache License 2.0](https://github.com/macrozheng/mall/blob/master/LICENSE)
 
-Copyright (c) 2018-2024 macrozheng
+Copyright (c) 2018-2026 macrozheng
