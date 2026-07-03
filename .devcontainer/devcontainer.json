@@ -2,6 +2,7 @@
   "name": "mall Java Dev",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
+  "remoteUser": "vscode",
   "workspaceFolder": "/workspaces/mall",
   "runServices": [
     "app",
@@ -57,9 +58,10 @@
       "extensions": [
         "vscjava.vscode-java-pack",
         "vscjava.vscode-spring-boot-dashboard",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "openai.chatgpt"
       ]
     }
   },
-  "postCreateCommand": "mvn -version"
+  "postCreateCommand": "bash /workspaces/mall/.devcontainer/post-create.sh"
 }
