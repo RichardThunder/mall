@@ -6,6 +6,7 @@ RUN find /etc/apt/sources.list.d -type f -name '*yarn*' -delete \
     && apt-get -y install --no-install-recommends \
         curl \
         default-mysql-client \
+        bubblewrap \
         iputils-ping \
         maven \
         netcat-openbsd \
@@ -23,3 +24,10 @@ RUN mkdir -p /home/vscode/.codex \
         /home/vscode/.vscode-server
 
 ENV PATH="/home/vscode/.local/bin:${PATH}"
+
+USER vscode
+
+RUN curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh \
+    && codex --version
+
+USER root
