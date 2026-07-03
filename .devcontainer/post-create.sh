@@ -13,5 +13,7 @@ mvn -version
 if command -v codex >/dev/null 2>&1; then
   codex --version
 else
-  curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh
+  npm config set prefix "$HOME/.local"
+  npm install -g @openai/codex
+  codex --version
 fi
