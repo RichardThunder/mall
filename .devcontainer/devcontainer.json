@@ -1,0 +1,65 @@
+{
+  "name": "mall Java Dev",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/mall",
+  "runServices": [
+    "app",
+    "mysql",
+    "mongodb",
+    "rabbitmq",
+    "redis"
+  ],
+  "shutdownAction": "stopCompose",
+  "overrideCommand": false,
+  "forwardPorts": [
+    3306,
+    6379,
+    27017,
+    5672,
+    15672,
+    8080,
+    8081,
+    8082,
+    8085
+  ],
+  "portsAttributes": {
+    "3306": {
+      "label": "MySQL"
+    },
+    "6379": {
+      "label": "Redis"
+    },
+    "27017": {
+      "label": "MongoDB"
+    },
+    "5672": {
+      "label": "RabbitMQ AMQP"
+    },
+    "15672": {
+      "label": "RabbitMQ Management"
+    },
+    "8080": {
+      "label": "mall-admin"
+    },
+    "8081": {
+      "label": "mall-search"
+    },
+    "8082": {
+      "label": "mall-demo"
+    },
+    "8085": {
+      "label": "mall-portal"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vscjava.vscode-spring-boot-dashboard",
+        "redhat.vscode-yaml"
+      ]
+    }
+  },
+  "postCreateCommand": "mvn -version"
+}
