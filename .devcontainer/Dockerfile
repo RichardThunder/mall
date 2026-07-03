@@ -10,6 +10,8 @@ RUN find /etc/apt/sources.list.d -type f -name '*yarn*' -delete \
         iputils-ping \
         maven \
         netcat-openbsd \
+        nodejs \
+        npm \
         redis-tools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -25,9 +27,5 @@ RUN mkdir -p /home/vscode/.codex \
 
 ENV PATH="/home/vscode/.local/bin:${PATH}"
 
-USER vscode
-
-RUN curl -fsSL https://chatgpt.com/codex/install.sh | CODEX_NON_INTERACTIVE=1 sh \
+RUN npm install -g @openai/codex \
     && codex --version
-
-USER root
