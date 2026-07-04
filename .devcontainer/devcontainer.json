@@ -4,6 +4,9 @@
   "service": "app",
   "remoteUser": "vscode",
   "workspaceFolder": "/workspaces/mall",
+  "containerEnv": {
+    "SHELL": "/usr/bin/zsh"
+  },
   "runServices": [
     "app",
     "mysql",
@@ -55,6 +58,9 @@
   },
   "customizations": {
     "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh"
+      },
       "extensions": [
         "vscjava.vscode-java-pack",
         "vscjava.vscode-spring-boot-dashboard",

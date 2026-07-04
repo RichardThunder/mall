@@ -1,0 +1,8 @@
+model = "gpt-5.5"
+model_reasoning_effort = "xhigh"
+
+[projects."/workspaces/mall"]
+trust_level = "trusted"
+
+[tui]
+theme = "monokai-extended"
