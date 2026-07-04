@@ -35,10 +35,23 @@ RUN mkdir -p /home/vscode/.codex \
         /home/vscode/.local \
         /home/vscode/.vscode-server
 
-RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /home/vscode/.oh-my-zsh \
-    && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git /home/vscode/.oh-my-zsh/custom/plugins/zsh-autosuggestions \
-    && git clone --depth=1 https://github.com/zsh-users/zsh-completions.git /home/vscode/.oh-my-zsh/custom/plugins/zsh-completions \
-    && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git /home/vscode/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting \
+RUN if [ ! -d /home/vscode/.oh-my-zsh/.git ]; then \
+        rm -rf /home/vscode/.oh-my-zsh \
+        && git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /home/vscode/.oh-my-zsh; \
+    fi \
+    && mkdir -p /home/vscode/.oh-my-zsh/custom/plugins \
+    && if [ ! -d /home/vscode/.oh-my-zsh/custom/plugins/zsh-autosuggestions/.git ]; then \
+        rm -rf /home/vscode/.oh-my-zsh/custom/plugins/zsh-autosuggestions \
+        && git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions.git /home/vscode/.oh-my-zsh/custom/plugins/zsh-autosuggestions; \
+    fi \
+    && if [ ! -d /home/vscode/.oh-my-zsh/custom/plugins/zsh-completions/.git ]; then \
+        rm -rf /home/vscode/.oh-my-zsh/custom/plugins/zsh-completions \
+        && git clone --depth=1 https://github.com/zsh-users/zsh-completions.git /home/vscode/.oh-my-zsh/custom/plugins/zsh-completions; \
+    fi \
+    && if [ ! -d /home/vscode/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting/.git ]; then \
+        rm -rf /home/vscode/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting \
+        && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting.git /home/vscode/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting; \
+    fi \
     && chown -R vscode:vscode /home/vscode/.oh-my-zsh \
     && chsh -s /usr/bin/zsh vscode
 
