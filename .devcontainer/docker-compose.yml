@@ -8,7 +8,7 @@ services:
     command: sleep infinity
     user: vscode
     working_dir: /workspaces/mall
-    mem_limit: 8g
+    mem_limit: 6g
     memswap_limit: -1
     depends_on:
       mysql:
